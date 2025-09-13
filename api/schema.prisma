@@ -1,0 +1,75 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  messages  Message[]
+}
+
+model Room {
+  id        String    @id @default(cuid())
+  name      String
+  createdAt DateTime  @default(now())
+  messages  Message[]
+  ideas     Idea[]
+}
+
+enum Role {
+  user
+  assistant
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  content   String
+  role      Role      @default(user)
+  createdAt DateTime  @default(now())
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  room      Room      @relation(fields: [roomId], references: [id])
+  roomId    String
+  tags      MessageTag[]
+}
+
+model Idea {
+  id        String   @id @default(cuid())
+  content   String
+  score     Int      @default(0)
+  createdAt DateTime @default(now())
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
+  votes     IdeaVote[]
+}
+
+model Tag {
+  id      String       @id @default(cuid())
+  name    String       @unique
+  messages MessageTag[]
+}
+
+model MessageTag {
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId String
+  tag       Tag     @relation(fields: [tagId], references: [id])
+  tagId     String
+
+  @@id([messageId, tagId])
+}
+
+model IdeaVote {
+  idea    Idea   @relation(fields: [ideaId], references: [id])
+  ideaId  String
+  userId  String
+  value   Int    @default(1)
+
+  @@id([ideaId, userId])
+}

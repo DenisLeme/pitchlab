@@ -1,0 +1,24 @@
+### Health
+GET http://localhost:4000/health
+
+### Rooms
+GET http://localhost:4000/rooms
+POST http://localhost:4000/rooms
+Content-Type: application/json
+
+{"name":"Sala Demo"}
+
+### Messages list
+GET http://localhost:4000/rooms/{{roomId}}/messages?limit=20
+
+### Create message
+POST http://localhost:4000/rooms/{{roomId}}/messages
+Content-Type: application/json
+
+{"authorName":"Arthur","content":"Olá PitchLab!","triggerAI":false}
+
+### AI summary
+POST http://localhost:4000/ai/summary
+Content-Type: application/json
+
+{"roomId":"{{roomId}}"}

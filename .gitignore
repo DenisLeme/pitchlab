@@ -1,0 +1,9 @@
+.env
+node_modules/
+dist/
+pnpm-lock.yaml
+yarn.lock
+.DS_Store
+.idea/
+.vscode/
+coverage/
