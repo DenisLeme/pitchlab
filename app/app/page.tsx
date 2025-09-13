@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const API = process.env.NEXT_PUBLIC_API_URL!
+const API = process.env.NEXT_PUBLIC_API_URL;
+console.log('API URL:', API);
 
 export default function Home() {
   const [rooms, setRooms] = useState<any[]>([])
@@ -9,20 +10,41 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
 
   const fetchRooms = async () => {
-    const r = await fetch(`${API}/rooms`)
-    const j = await r.json()
-    setRooms(j)
-  }
+    const url = `${API}/rooms`;
+    console.log('GET', url);
+    try {
+      const r = await fetch(url, { mode: 'cors' });
+      console.log('status', r.status);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const j = await r.json();
+      setRooms(j);
+    } catch (e) {
+      console.error('fetchRooms error', e);
+    }
+  };
 
   useEffect(() => { fetchRooms() }, [])
 
   const createRoom = async () => {
     if (!name.trim()) return
     setLoading(true)
-    await fetch(`${API}/rooms`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })
-    setName('')
-    setLoading(false)
-    fetchRooms()
+    try {
+      const url = `${API}/rooms`
+      console.log('POST', url, { name })
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      console.log('POST status', r.status)
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      setName('')
+      await fetchRooms()
+    } catch (e) {
+      console.error('createRoom error:', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
